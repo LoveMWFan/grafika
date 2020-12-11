@@ -47,7 +47,7 @@ public class GlesInfoActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gles_info);
 
-        mOutputFile = new File(getFilesDir(), "gles-info.txt");
+        mOutputFile = new File(getExternalCacheDir(), "gles-info.txt");
         TextView tv = (TextView) findViewById(R.id.glesInfoFile_text);
         tv.setText(mOutputFile.toString());
 

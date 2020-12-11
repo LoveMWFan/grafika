@@ -55,12 +55,12 @@ import java.lang.ref.WeakReference;
  * <li>for each frame, after latching it with SurfaceTexture#updateTexImage(),
  *     call TextureMovieEncoder#frameAvailable().
  * </ul>
- *
+ * <p>
  * TODO: tweak the API (esp. textureId) so it's less awkward for simple use cases.
  */
 public class TextureMovieEncoder implements Runnable {
     private static final String TAG = MainActivity.TAG;
-    private static final boolean VERBOSE = false;
+    private static final boolean VERBOSE = true;
 
     private static final int MSG_START_RECORDING = 0;
     private static final int MSG_STOP_RECORDING = 1;
@@ -93,7 +93,7 @@ public class TextureMovieEncoder implements Runnable {
      * under us).
      * <p>
      * TODO: make frame rate and iframe interval configurable?  Maybe use builder pattern
-     *       with reasonable defaults for those and bit rate.
+     * with reasonable defaults for those and bit rate.
      */
     public static class EncoderConfig {
         final File mOutputFile;
@@ -103,7 +103,7 @@ public class TextureMovieEncoder implements Runnable {
         final EGLContext mEglContext;
 
         public EncoderConfig(File outputFile, int width, int height, int bitRate,
-                EGLContext sharedEglContext) {
+                             EGLContext sharedEglContext) {
             mOutputFile = outputFile;
             mWidth = width;
             mHeight = height;
@@ -234,6 +234,7 @@ public class TextureMovieEncoder implements Runnable {
     /**
      * Encoder thread entry point.  Establishes Looper/Handler and waits for messages.
      * <p>
+     *
      * @see java.lang.Thread#run()
      */
     @Override
@@ -319,14 +320,26 @@ public class TextureMovieEncoder implements Runnable {
      * The texture is rendered onto the encoder's input surface, along with a moving
      * box (just because we can).
      * <p>
-     * @param transform The texture transform, from SurfaceTexture.
+     *
+     * @param transform      The texture transform, from SurfaceTexture.
      * @param timestampNanos The frame's timestamp, from SurfaceTexture.
      */
     private void handleFrameAvailable(float[] transform, long timestampNanos) {
-        if (VERBOSE) Log.d(TAG, "handleFrameAvailable tr=" + transform);
+        if (VERBOSE) Log.d("MFB", "handleFrameAvailable tr=" + transform);
         mVideoEncoder.drainEncoder(false);
-        mFullScreen.drawFrame(mTextureId, transform);
+        Texture2dProgram program = mFullScreen.getProgram();
+        if (program != null) {
+            Texture2dProgram.ProgramType programType = program.getProgramType();
+            if (VERBOSE) Log.d("MFB", "handleFrameAvailable programType=" + programType);
+        }
 
+        mFullScreen.changeProgram(new Texture2dProgram(Texture2dProgram.ProgramType.TEXTURE_EXT_BW));
+        program = mFullScreen.getProgram();
+        if (program != null) {
+            Texture2dProgram.ProgramType programType = program.getProgramType();
+            if (VERBOSE) Log.d("MFB", "handleFrameAvailable programType=" + programType);
+        }
+        mFullScreen.drawFrame(mTextureId, transform);
         drawBox(mFrameNum++);
 
         mInputWindowSurface.setPresentationTime(timestampNanos);
@@ -376,7 +389,7 @@ public class TextureMovieEncoder implements Runnable {
     }
 
     private void prepareEncoder(EGLContext sharedContext, int width, int height, int bitRate,
-            File outputFile) {
+                                File outputFile) {
         try {
             mVideoEncoder = new VideoEncoderCore(width, height, bitRate, outputFile);
         } catch (IOException ioe) {

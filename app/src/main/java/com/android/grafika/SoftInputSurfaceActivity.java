@@ -72,7 +72,7 @@ public class SoftInputSurfaceActivity extends Activity {
         // Be VERY BAD and do the whole thing during onCreate().
         Log.i(TAG, "Generating movie...");
         try {
-            generateMovie(new File(getFilesDir(), "soft-input-surface.mp4"));
+            generateMovie(new File(getExternalCacheDir(), "soft-input-surface.mp4"));
             tv.setText(getString(R.string.succeeded));
             Log.i(TAG, "Movie generation complete");
         } catch (Exception ex) {

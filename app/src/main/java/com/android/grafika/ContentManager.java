@@ -77,7 +77,7 @@ public class ContentManager {
         ContentManager mgr = getInstance();
         synchronized (sLock) {
             if (!mgr.mInitialized) {
-                mgr.mFilesDir = context.getFilesDir();
+                mgr.mFilesDir = context.getExternalCacheDir();
                 mgr.mContent = new ArrayList<Content>();
                 mgr.mInitialized = true;
             }

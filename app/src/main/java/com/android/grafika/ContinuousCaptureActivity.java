@@ -22,7 +22,7 @@ import android.opengl.GLES20;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
@@ -173,7 +173,7 @@ public class ContinuousCaptureActivity extends Activity implements SurfaceHolder
         mHandler = new MainHandler(this);
         mHandler.sendEmptyMessageDelayed(MainHandler.MSG_BLINK_TEXT, 1500);
 
-        mOutputFile = new File(getFilesDir(), "continuous-capture.mp4");
+        mOutputFile = new File(getExternalCacheDir(), "continuous-capture.mp4");
         mSecondsOfVideo = 0.0f;
         updateControls();
     }
